@@ -1,0 +1,28 @@
+# Variables de entorno
+.env
+
+# Logs
+storage/logs/*.log
+
+# Sesiones locales
+storage/sessions/*
+!storage/sessions/.gitkeep
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependencias (para futuro)
+/vendor/
+/node_modules/
+
+# Temporales
+*.tmp
+*.bak
+*~

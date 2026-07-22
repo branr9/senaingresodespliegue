@@ -1,0 +1,452 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Documentación Sistema de Control de Ingreso SENA</title>
+<style>
+body { font-family: Calibri, Arial, sans-serif; margin: 40px; line-height: 1.6; }
+h1 { color: #39A900; border-bottom: 3px solid #39A900; padding-bottom: 10px; }
+h2 { color: #004884; margin-top: 30px; border-bottom: 2px solid #004884; padding-bottom: 5px; }
+h3 { color: #666; margin-top: 20px; }
+.section { margin-bottom: 30px; }
+table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+th { background-color: #004884; color: white; padding: 10px; text-align: left; }
+td { border: 1px solid #ddd; padding: 8px; }
+tr:nth-child(even) { background-color: #f9f9f9; }
+.highlight { background-color: #FFF3CD; padding: 15px; border-left: 4px solid #FFC107; margin: 15px 0; }
+.flow { background-color: #E3F2FD; padding: 15px; border-left: 4px solid #2196F3; margin: 15px 0; }
+ul { margin: 10px 0; }
+li { margin: 5px 0; }
+.header-info { text-align: right; color: #666; font-size: 10pt; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+
+<div class="header-info">
+<strong>SENA - Centro de Formación</strong><br>
+Sistema de Control de Ingreso y Accesos<br>
+Fecha: Febrero 2026
+</div>
+
+<h1>📋 SISTEMA DE CONTROL DE INGRESO - SENA</h1>
+
+<div class="section">
+<h2>1. DESCRIPCIÓN GENERAL</h2>
+<p>Sistema web desarrollado en PHP para la gestión integral de accesos, control de personal y administración de llaves en las instalaciones del SENA. Utiliza arquitectura MVC (Modelo-Vista-Controlador) con medidas de seguridad robustas.</p>
+
+<div class="highlight">
+<strong>🎯 Objetivo:</strong> Automatizar y centralizar el control de ingreso de estudiantes, instructores, contratistas y visitantes mediante registro de marcaciones y gestión de llaves.
+</div>
+</div>
+
+<div class="section">
+<h2>2. ARQUITECTURA DEL SISTEMA</h2>
+
+<h3>2.1 Patrón de Diseño: MVC (Modelo-Vista-Controlador)</h3>
+
+<table>
+<tr>
+<th width="20%">Capa</th>
+<th width="40%">Responsabilidad</th>
+<th width="40%">Componentes</th>
+</tr>
+<tr>
+<td><strong>Modelo</strong></td>
+<td>Lógica de negocio y acceso a datos</td>
+<td>
+• Database.php (Conexión PDO)<br>
+• User.php, UserModel.php<br>
+• AccessControlModel.php<br>
+• KeysModel.php
+</td>
+</tr>
+<tr>
+<td><strong>Vista</strong></td>
+<td>Presentación e interfaz de usuario</td>
+<td>
+• layouts/ (header, footer)<br>
+• auth/ (login)<br>
+• keys/ (gestión llaves)<br>
+• usuarios/ (CRUD usuarios)
+</td>
+</tr>
+<tr>
+<td><strong>Controlador</strong></td>
+<td>Coordinación entre modelo y vista</td>
+<td>
+• AuthController.php<br>
+• UsersController.php<br>
+• KeysController.php<br>
+• AccessControlController.php<br>
+• ReportsController.php
+</td>
+</tr>
+<tr>
+<td><strong>Middleware</strong></td>
+<td>Autenticación y autorización</td>
+<td>
+• Auth.php (Verificación de sesiones y roles)
+</td>
+</tr>
+</table>
+
+<h3>2.2 Estructura de Directorios</h3>
+<pre>
+desarrollo-ingreso/
+├── app/
+│   ├── controllers/     → Lógica de control
+│   ├── models/          → Acceso a base de datos
+│   ├── views/           → Interfaz HTML
+│   ├── middleware/      → Seguridad
+│   └── helpers/         → Funciones auxiliares
+├── config/              → Configuración del sistema
+├── database/            → Scripts SQL y migraciones
+├── public/              → Punto de entrada (index.php)
+│   ├── css/
+│   └── js/
+└── storage/             → Logs y archivos temporales
+</pre>
+</div>
+
+<div class="section">
+<h2>3. MÓDULOS DEL SISTEMA</h2>
+
+<h3>3.1 Módulo de Autenticación</h3>
+<ul>
+<li><strong>Login seguro:</strong> Contraseñas con bcrypt, protección CSRF, control de intentos fallidos</li>
+<li><strong>Sistema de roles:</strong> Admin, Instructor, Vigilante</li>
+<li><strong>Gestión de sesiones:</strong> Expiración automática, regeneración de ID</li>
+<li><strong>Auditoría:</strong> Registro de todos los accesos al sistema</li>
+</ul>
+
+<h3>3.2 Módulo de Usuarios</h3>
+<ul>
+<li><strong>CRUD completo:</strong> Crear, leer, actualizar, eliminar usuarios</li>
+<li><strong>Importación masiva:</strong> Carga de usuarios por archivo CSV</li>
+<li><strong>Roles y permisos:</strong> Asignación dinámica de privilegios</li>
+<li><strong>Borrado lógico:</strong> Los registros no se eliminan físicamente</li>
+</ul>
+
+<h3>3.3 Módulo de Control de Ingreso (Kiosko)</h3>
+<ul>
+<li><strong>Lector de código de barras:</strong> Identificación automática por documento</li>
+<li><strong>Registro de marcaciones:</strong> ENTRADA/SALIDA con timestamp</li>
+<li><strong>Validación de estado:</strong> Verificación de personas activas/inactivas</li>
+<li><strong>Modo vigilante:</strong> Interfaz simplificada para operación en puerta</li>
+</ul>
+
+<h3>3.4 Módulo de Control de Llaves</h3>
+<ul>
+<li><strong>Gestión de aulas:</strong> Registro de espacios y cantidad de llaves</li>
+<li><strong>Préstamo:</strong> Asignación de llaves a instructores</li>
+<li><strong>Devolución:</strong> Registro de entrega con observaciones</li>
+<li><strong>Historial:</strong> Trazabilidad completa de movimientos</li>
+</ul>
+
+<h3>3.5 Módulo de Reportes</h3>
+<ul>
+<li><strong>Reportes de acceso:</strong> Filtros por fecha y documento</li>
+<li><strong>Estadísticas:</strong> Entradas, salidas, préstamos</li>
+<li><strong>Exportación:</strong> Descarga en formato Excel</li>
+</ul>
+</div>
+
+<div class="section">
+<h2>4. FLUJO DE OPERACIÓN DEL SISTEMA</h2>
+
+<h3>4.1 Flujo de Autenticación</h3>
+<div class="flow">
+<strong>1.</strong> Usuario accede a /login<br>
+<strong>2.</strong> Ingresa credenciales (username/email + password)<br>
+<strong>3.</strong> Sistema valida contra base de datos (password_verify)<br>
+<strong>4.</strong> Si exitoso → Crea sesión + Registra auditoría + Redirige a Dashboard<br>
+<strong>5.</strong> Si falla → Incrementa intentos fallidos + Bloquea tras 5 intentos
+</div>
+
+<h3>4.2 Flujo de Control de Ingreso con Código de Barras</h3>
+<div class="flow">
+<strong>1.</strong> Vigilante activa modo Kiosko (/control-ingreso/kiosk)<br>
+<strong>2.</strong> Usuario escanea código de barras (número de documento)<br>
+<strong>3.</strong> Sistema busca persona por documento en base de datos<br>
+<strong>4.</strong> Valida estado: ¿Activo o Inactivo?<br>
+<strong>5.</strong> Determina tipo de evento: ¿Última marcación fue ENTRADA → ahora SALIDA? o viceversa<br>
+<strong>6.</strong> Registra marcación en tabla 'marcaciones'<br>
+<strong>7.</strong> Muestra resultado en pantalla: ACCESO PERMITIDO ✅ o ACCESO DENEGADO ❌<br>
+<strong>8.</strong> Auto-reset tras 4 segundos para siguiente escaneo
+</div>
+
+<h3>4.3 Flujo de Préstamo de Llaves</h3>
+<div class="flow">
+<strong>1.</strong> Instructor accede a /control-llaves/prestamo<br>
+<strong>2.</strong> Selecciona aula disponible<br>
+<strong>3.</strong> Ingresa datos del receptor (nombre, documento, depto.)<br>
+<strong>4.</strong> Sistema valida disponibilidad de llaves<br>
+<strong>5.</strong> Registra préstamo con estado 'PRESTADO'<br>
+<strong>6.</strong> Al devolver: actualiza estado a 'DEVUELTO' + registra observaciones
+</div>
+</div>
+
+<div class="section">
+<h2>5. BASE DE DATOS</h2>
+
+<h3>5.1 Tablas Principales</h3>
+<table>
+<tr>
+<th width="25%">Tabla</th>
+<th width="75%">Descripción</th>
+</tr>
+<tr>
+<td><strong>usuarios</strong></td>
+<td>Usuarios del sistema (admin, instructor, vigilante) con credenciales de acceso</td>
+</tr>
+<tr>
+<td><strong>personas</strong></td>
+<td>Registro de estudiantes, contratistas, visitantes con documento único</td>
+</tr>
+<tr>
+<td><strong>marcaciones</strong></td>
+<td>Registro de ENTRADA/SALIDA con fecha/hora, método (BARCODE/HUELLA), persona_id</td>
+</tr>
+<tr>
+<td><strong>aulas</strong></td>
+<td>Espacios físicos con cantidad de llaves disponibles</td>
+</tr>
+<tr>
+<td><strong>prestamos_llaves</strong></td>
+<td>Préstamos y devoluciones de llaves con receptor, fecha/hora, observaciones</td>
+</tr>
+<tr>
+<td><strong>auditoria_accesos</strong></td>
+<td>Log de todos los accesos al sistema (login, logout, acciones)</td>
+</tr>
+<tr>
+<td><strong>auditoria_usuarios</strong></td>
+<td>Trazabilidad de cambios en usuarios (crear, editar, eliminar)</td>
+</tr>
+</table>
+
+<h3>5.2 Relaciones Clave</h3>
+<ul>
+<li><strong>personas → marcaciones:</strong> Una persona tiene muchas marcaciones (1:N)</li>
+<li><strong>usuarios → prestamos_llaves:</strong> Un usuario gestiona muchos préstamos (1:N)</li>
+<li><strong>aulas → prestamos_llaves:</strong> Un aula tiene muchos préstamos (1:N)</li>
+</ul>
+</div>
+
+<div class="section">
+<h2>6. SEGURIDAD IMPLEMENTADA</h2>
+
+<table>
+<tr>
+<th width="30%">Medida de Seguridad</th>
+<th width="70%">Implementación</th>
+</tr>
+<tr>
+<td><strong>Contraseñas</strong></td>
+<td>Hashing con password_hash() usando bcrypt (costo 12)</td>
+</tr>
+<tr>
+<td><strong>SQL Injection</strong></td>
+<td>PDO con prepared statements en todas las consultas</td>
+</tr>
+<tr>
+<td><strong>XSS</strong></td>
+<td>Función htmlspecialchars() en todas las salidas</td>
+</tr>
+<tr>
+<td><strong>CSRF</strong></td>
+<td>Tokens únicos por sesión en todos los formularios POST</td>
+</tr>
+<tr>
+<td><strong>Sesiones</strong></td>
+<td>HttpOnly, SameSite=Strict, regeneración de ID tras login</td>
+</tr>
+<tr>
+<td><strong>Autenticación</strong></td>
+<td>Middleware Auth.php valida sesión y rol en cada request</td>
+</tr>
+<tr>
+<td><strong>Control de acceso</strong></td>
+<td>Roles y permisos: Admin (total), Instructor (gestión), Vigilante (solo kiosko)</td>
+</tr>
+<tr>
+<td><strong>Auditoría</strong></td>
+<td>Registro de todas las acciones con IP, user agent, timestamp</td>
+</tr>
+<tr>
+<td><strong>Bloqueo por intentos</strong></td>
+<td>5 intentos fallidos = bloqueo 15 minutos</td>
+</tr>
+</table>
+</div>
+
+<div class="section">
+<h2>7. TECNOLOGÍAS UTILIZADAS</h2>
+
+<table>
+<tr>
+<th width="30%">Componente</th>
+<th width="70%">Tecnología</th>
+</tr>
+<tr>
+<td><strong>Backend</strong></td>
+<td>PHP 8.0+ (POO, PDO, Sesiones)</td>
+</tr>
+<tr>
+<td><strong>Base de Datos</strong></td>
+<td>MySQL 8.0+ (InnoDB, UTF-8, Transacciones)</td>
+</tr>
+<tr>
+<td><strong>Frontend</strong></td>
+<td>HTML5, CSS3, JavaScript Vanilla</td>
+</tr>
+<tr>
+<td><strong>Servidor Web</strong></td>
+<td>Apache / PHP Built-in Server</td>
+</tr>
+<tr>
+<td><strong>Hardware</strong></td>
+<td>Lector láser de código de barras (Keyboard Wedge Mode)</td>
+</tr>
+<tr>
+<td><strong>Arquitectura</strong></td>
+<td>MVC (Modelo-Vista-Controlador)</td>
+</tr>
+</table>
+</div>
+
+<div class="section">
+<h2>8. ROLES Y PERMISOS</h2>
+
+<table>
+<tr>
+<th width="20%">Rol</th>
+<th width="80%">Permisos</th>
+</tr>
+<tr>
+<td><strong>Admin</strong></td>
+<td>
+• Acceso total al sistema<br>
+• CRUD de usuarios<br>
+• Gestión de aulas y llaves<br>
+• Generación de reportes<br>
+• Configuración del sistema
+</td>
+</tr>
+<tr>
+<td><strong>Instructor</strong></td>
+<td>
+• Ver dashboard<br>
+• Préstamo y devolución de llaves<br>
+• Ver historial de llaves<br>
+• Ver lista de usuarios (solo lectura)
+</td>
+</tr>
+<tr>
+<td><strong>Vigilante</strong></td>
+<td>
+• Acceso al modo Kiosko<br>
+• Registro de marcaciones (entrada/salida)<br>
+• Validación de código de barras<br>
+• Sin acceso a módulos administrativos
+</td>
+</tr>
+</table>
+</div>
+
+<div class="section">
+<h2>9. INSTALACIÓN Y CONFIGURACIÓN</h2>
+
+<h3>9.1 Requisitos</h3>
+<ul>
+<li>PHP 8.0 o superior</li>
+<li>MySQL 8.0 o superior</li>
+<li>Extensiones PHP: PDO, pdo_mysql, mbstring</li>
+<li>Lector de código de barras con modo teclado (Keyboard Wedge)</li>
+</ul>
+
+<h3>9.2 Instalación Rápida</h3>
+<pre>
+1. Crear base de datos:
+   mysql -u root -p &lt; database/schema.sql
+   mysql -u root -p &lt; database/seeds.sql
+
+2. Configurar .env:
+   DB_HOST=localhost
+   DB_NAME=sistema_ingreso
+   DB_USER=root
+   DB_PASS=tu_password
+
+3. Iniciar servidor:
+   php -S localhost:8000 -t public
+
+4. Acceder:
+   http://localhost:8000
+   Usuario: admin / Admin123!
+</pre>
+
+<h3>9.3 Configuración del Lector de Código de Barras</h3>
+<ul>
+<li><strong>Modo:</strong> Keyboard Wedge (simular teclado)</li>
+<li><strong>Sufijo:</strong> Enter (tecla automática al final)</li>
+<li><strong>Formato códigos:</strong> Code 39, Code 128, EAN-13</li>
+<li><strong>Contenido:</strong> Número de documento de la persona</li>
+</ul>
+</div>
+
+<div class="section">
+<h2>10. CARACTERÍSTICAS DESTACADAS</h2>
+
+<div class="highlight">
+<strong>✅ Ventajas del Sistema:</strong>
+<ul style="margin-top: 10px;">
+<li><strong>Sin costo de licencias:</strong> 100% código abierto (PHP, MySQL)</li>
+<li><strong>Fácil mantenimiento:</strong> Arquitectura MVC clara y documentada</li>
+<li><strong>Escalable:</strong> Preparado para agregar módulos (reservas, permisos)</li>
+<li><strong>Seguro:</strong> Cumple estándares OWASP (Top 10)</li>
+<li><strong>Auditable:</strong> Trazabilidad completa de todas las acciones</li>
+<li><strong>Rápido:</strong> Registro de marcaciones en menos de 2 segundos</li>
+<li><strong>Intuitivo:</strong> Interfaz simple para vigilantes e instructores</li>
+<li><strong>Offline-first:</strong> Funciona en red local sin dependencias externas</li>
+</ul>
+</div>
+</div>
+
+<div class="section">
+<h2>11. CASOS DE USO PRINCIPALES</h2>
+
+<h3>Caso 1: Ingreso de Estudiante</h3>
+<p><strong>Actor:</strong> Vigilante + Estudiante<br>
+<strong>Flujo:</strong> Estudiante llega, escanea documento → Sistema valida → Registra ENTRADA → Permite acceso</p>
+
+<h3>Caso 2: Préstamo de Llave de Aula</h3>
+<p><strong>Actor:</strong> Instructor<br>
+<strong>Flujo:</strong> Instructor solicita llave → Sistema verifica disponibilidad → Registra préstamo → Entrega llave física</p>
+
+<h3>Caso 3: Generación de Reporte Mensual</h3>
+<p><strong>Actor:</strong> Administrador<br>
+<strong>Flujo:</strong> Admin accede a reportes → Filtra por fechas → Exporta Excel → Analiza datos</p>
+</div>
+
+<div class="section">
+<h2>12. FUTURAS MEJORAS PLANIFICADAS</h2>
+<ul>
+<li>🔄 Integración con lector de huella dactilar</li>
+<li>📱 Aplicación móvil para autoaprobaciones</li>
+<li>📊 Dashboard con gráficos en tiempo real</li>
+<li>🔔 Notificaciones automáticas vía email/SMS</li>
+<li>📅 Módulo de reserva de ambientes</li>
+<li>📝 Permisos de salida digital</li>
+<li>🔗 API REST para integración con otros sistemas</li>
+</ul>
+</div>
+
+<div class="section" style="margin-top: 50px; border-top: 2px solid #ccc; padding-top: 20px;">
+<p style="text-align: center; color: #666;">
+<strong>Sistema de Control de Ingreso SENA</strong><br>
+Desarrollado en 2026 para el Servicio Nacional de Aprendizaje<br>
+Versión 1.0 - Febrero 2026
+</p>
+</div>
+
+</body>
+</html>
